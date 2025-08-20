@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emby UI Plugin - Theme Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .theme-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .theme-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: #333;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .theme-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .theme-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .theme-btn:hover::before {
+            left: 100%;
+        }
+
+        .preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .preview-section {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .preview-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 5px;
+        }
+
+        .emby-card {
+            background: var(--emby-card-bg, #333);
+            border-radius: var(--emby-border-radius, 8px);
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--emby-border-color, #444);
+            transition: all 0.3s ease;
+        }
+
+        .emby-card:hover {
+            background: var(--emby-card-hover-bg, #444);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .emby-button {
+            background: var(--emby-primary-color, #667eea);
+            color: var(--emby-primary-text, #fff);
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--emby-border-radius, 8px);
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .emby-button:hover {
+            background: var(--emby-primary-hover, #5a67d8);
+            transform: translateY(-1px);
+        }
+
+        .emby-button.secondary {
+            background: var(--emby-secondary-color, #718096);
+        }
+
+        .emby-button.secondary:hover {
+            background: var(--emby-secondary-hover, #4a5568);
+        }
+
+        .emby-input {
+            background: var(--emby-input-bg, #444);
+            border: 1px solid var(--emby-border-color, #555);
+            color: var(--emby-text-color, #fff);
+            padding: 10px;
+            border-radius: var(--emby-border-radius, 8px);
+            width: 100%;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .emby-input:focus {
+            outline: none;
+            border-color: var(--emby-primary-color, #667eea);
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .emby-nav {
+            background: var(--emby-nav-bg, #2d3748);
+            padding: 15px;
+            border-radius: var(--emby-border-radius, 8px);
+            margin-bottom: 15px;
+        }
+
+        .nav-item {
+            display: inline-block;
+            padding: 8px 16px;
+            margin-right: 10px;
+            background: var(--emby-nav-item-bg, #4a5568);
+            color: var(--emby-nav-item-text, #fff);
+            text-decoration: none;
+            border-radius: var(--emby-border-radius, 8px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background: var(--emby-nav-item-hover, #667eea);
+        }
+
+        .nav-item.active {
+            background: var(--emby-primary-color, #667eea);
+        }
+
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .media-item {
+            background: var(--emby-card-bg, #333);
+            border-radius: var(--emby-border-radius, 8px);
+            padding: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid var(--emby-border-color, #444);
+        }
+
+        .media-item:hover {
+            background: var(--emby-card-hover-bg, #444);
+            transform: scale(1.05);
+        }
+
+        .media-poster {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: var(--emby-border-radius, 8px);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--emby-progress-bg, #444);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--emby-primary-color, #667eea);
+            width: 65%;
+            transition: width 0.3s ease;
+        }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .color-item {
+            text-align: center;
+            padding: 10px;
+            border-radius: var(--emby-border-radius, 8px);
+            background: var(--emby-card-bg, #333);
+            border: 1px solid var(--emby-border-color, #444);
+        }
+
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 0 auto 8px;
+            border: 2px solid var(--emby-border-color, #444);
+        }
+
+        .color-name {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: #2a2a2a;
+            border-radius: 12px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .preview-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .theme-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Emby UI 主题预览</h1>
+            <p>体验不同主题风格，选择您喜欢的界面外观</p>
+        </div>
+
+        <div class="theme-selector">
+            <button class="theme-btn active" data-theme="dark-modern">🌙 深色现代</button>
+            <button class="theme-btn" data-theme="light-elegant">☀️ 浅色优雅</button>
+            <button class="theme-btn" data-theme="custom">🎨 自定义</button>
+        </div>
+
+        <div class="preview-container">
+            <div class="preview-section">
+                <h3 class="section-title">导航栏</h3>
+                <div class="emby-nav">
+                    <a href="#" class="nav-item active">首页</a>
+                    <a href="#" class="nav-item">电影</a>
+                    <a href="#" class="nav-item">电视剧</a>
+                    <a href="#" class="nav-item">音乐</a>
+                    <a href="#" class="nav-item">设置</a>
+                </div>
+            </div>
+
+            <div class="preview-section">
+                <h3 class="section-title">卡片组件</h3>
+                <div class="emby-card">
+                    <h4>示例电影</h4>
+                    <p>这是一个示例电影卡片，展示了主题的卡片样式效果。</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <button class="emby-button">播放</button>
+                    <button class="emby-button secondary">详情</button>
+                </div>
+            </div>
+
+            <div class="preview-section">
+                <h3 class="section-title">表单元素</h3>
+                <input type="text" class="emby-input" placeholder="搜索电影、电视剧...">
+                <input type="text" class="emby-input" placeholder="用户名">
+                <input type="password" class="emby-input" placeholder="密码">
+                <button class="emby-button">登录</button>
+                <button class="emby-button secondary">取消</button>
+            </div>
+
+            <div class="preview-section">
+                <h3 class="section-title">媒体网格</h3>
+                <div class="media-grid">
+                    <div class="media-item">
+                        <div class="media-poster">电影 1</div>
+                        <div>复仇者联盟</div>
+                    </div>
+                    <div class="media-item">
+                        <div class="media-poster">电影 2</div>
+                        <div>星际穿越</div>
+                    </div>
+                    <div class="media-item">
+                        <div class="media-poster">电影 3</div>
+                        <div>盗梦空间</div>
+                    </div>
+                    <div class="media-item">
+                        <div class="media-poster">电影 4</div>
+                        <div>黑客帝国</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-section">
+                <h3 class="section-title">颜色调色板</h3>
+                <div class="color-palette">
+                    <div class="color-item">
+                        <div class="color-swatch" style="background: var(--emby-primary-color, #667eea);"></div>
+                        <div class="color-name">主色调</div>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch" style="background: var(--emby-secondary-color, #718096);"></div>
+                        <div class="color-name">次要色</div>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch" style="background: var(--emby-accent-color, #f093fb);"></div>
+                        <div class="color-name">强调色</div>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch" style="background: var(--emby-success-color, #48bb78);"></div>
+                        <div class="color-name">成功色</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2024 Emby UI Beautification Plugin - 让您的 Emby 更加美观</p>
+        </div>
+    </div>
+
+    <script>
+        // 主题切换功能
+        const themeButtons = document.querySelectorAll('.theme-btn');
+        const body = document.body;
+
+        // 主题配置
+        const themes = {
+            'dark-modern': {
+                '--emby-primary-color': '#667eea',
+                '--emby-primary-hover': '#5a67d8',
+                '--emby-primary-text': '#ffffff',
+                '--emby-secondary-color': '#718096',
+                '--emby-secondary-hover': '#4a5568',
+                '--emby-accent-color': '#f093fb',
+                '--emby-success-color': '#48bb78',
+                '--emby-warning-color': '#ed8936',
+                '--emby-error-color': '#f56565',
+                '--emby-bg-color': '#1a202c',
+                '--emby-surface-color': '#2d3748',
+                '--emby-card-bg': '#2d3748',
+                '--emby-card-hover-bg': '#4a5568',
+                '--emby-text-color': '#ffffff',
+                '--emby-text-secondary': '#a0aec0',
+                '--emby-border-color': '#4a5568',
+                '--emby-border-radius': '8px',
+                '--emby-nav-bg': '#2d3748',
+                '--emby-nav-item-bg': '#4a5568',
+                '--emby-nav-item-hover': '#667eea',
+                '--emby-nav-item-text': '#ffffff',
+                '--emby-input-bg': '#4a5568',
+                '--emby-progress-bg': '#4a5568'
+            },
+            'light-elegant': {
+                '--emby-primary-color': '#6366f1',
+                '--emby-primary-hover': '#4f46e5',
+                '--emby-primary-text': '#ffffff',
+                '--emby-secondary-color': '#64748b',
+                '--emby-secondary-hover': '#475569',
+                '--emby-accent-color': '#ec4899',
+                '--emby-success-color': '#10b981',
+                '--emby-warning-color': '#f59e0b',
+                '--emby-error-color': '#ef4444',
+                '--emby-bg-color': '#f8fafc',
+                '--emby-surface-color': '#ffffff',
+                '--emby-card-bg': '#ffffff',
+                '--emby-card-hover-bg': '#f1f5f9',
+                '--emby-text-color': '#1e293b',
+                '--emby-text-secondary': '#64748b',
+                '--emby-border-color': '#e2e8f0',
+                '--emby-border-radius': '12px',
+                '--emby-nav-bg': '#ffffff',
+                '--emby-nav-item-bg': '#f1f5f9',
+                '--emby-nav-item-hover': '#6366f1',
+                '--emby-nav-item-text': '#1e293b',
+                '--emby-input-bg': '#ffffff',
+                '--emby-progress-bg': '#e2e8f0'
+            }
+        };
+
+        // 应用主题
+        function applyTheme(themeName) {
+            const theme = themes[themeName];
+            if (!theme) return;
+
+            // 应用CSS变量
+            Object.entries(theme).forEach(([property, value]) => {
+                document.documentElement.style.setProperty(property, value);
+            });
+
+            // 更新body背景色
+            body.style.background = theme['--emby-bg-color'];
+            body.style.color = theme['--emby-text-color'];
+
+            // 更新按钮状态
+            themeButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.theme === themeName) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // 保存主题选择
+            localStorage.setItem('emby-preview-theme', themeName);
+        }
+
+        // 事件监听
+        themeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const theme = button.dataset.theme;
+                if (theme === 'custom') {
+                    // 打开自定义主题编辑器
+                    window.open('../pages/plugin-manager.html', '_blank');
+                } else {
+                    applyTheme(theme);
+                }
+            });
+        });
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 加载保存的主题
+            const savedTheme = localStorage.getItem('emby-preview-theme') || 'dark-modern';
+            applyTheme(savedTheme);
+
+            // 添加动画效果
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+
+            document.querySelectorAll('.preview-section').forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(section);
+            });
+        });
+
+        // 实时预览效果
+        setInterval(() => {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const randomWidth = Math.random() * 100;
+                bar.style.width = randomWidth + '%';
+            });
+        }, 3000);
+    </script>
+</body>
+</html>

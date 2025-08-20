@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emby UI Plugin - Advanced Settings</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            min-width: 120px;
+        }
+
+        .nav-tab.active {
+            background: #667eea;
+            color: #fff;
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: #333;
+            color: #fff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .settings-section {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #444;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-info {
+            flex: 1;
+        }
+
+        .setting-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .setting-description {
+            font-size: 0.9rem;
+            color: #ccc;
+            line-height: 1.4;
+        }
+
+        .setting-control {
+            margin-left: 20px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #444;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: #667eea;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(30px);
+        }
+
+        .input-field {
+            background: #333;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .select-field {
+            background: #333;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            width: 200px;
+            cursor: pointer;
+        }
+
+        .color-picker {
+            width: 50px;
+            height: 35px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .range-slider {
+            width: 200px;
+            height: 6px;
+            background: #444;
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .range-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .range-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #718096;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #4a5568;
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        .custom-css-editor {
+            width: 100%;
+            height: 300px;
+            background: #1e1e1e;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 15px;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .custom-css-editor:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .backup-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #333;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .backup-info {
+            flex: 1;
+        }
+
+        .backup-date {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        .backup-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-active {
+            background: #48bb78;
+        }
+
+        .status-inactive {
+            background: #f56565;
+        }
+
+        .status-warning {
+            background: #ed8936;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #667eea20, #764ba220);
+            border: 1px solid #667eea40;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .warning-card {
+            background: linear-gradient(135deg, #ed893620, #f5656520);
+            border: 1px solid #ed893640;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .setting-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .setting-control {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .input-field, .select-field, .range-slider {
+                width: 100%;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .nav-tab {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ 高级设置</h1>
+            <p>自定义您的 Emby UI 插件体验</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="general">🔧 常规设置</button>
+            <button class="nav-tab" data-tab="appearance">🎨 外观定制</button>
+            <button class="nav-tab" data-tab="performance">⚡ 性能优化</button>
+            <button class="nav-tab" data-tab="advanced">🔬 高级选项</button>
+            <button class="nav-tab" data-tab="backup">💾 备份还原</button>
+        </div>
+
+        <!-- 常规设置 -->
+        <div class="tab-content active" id="general">
+            <div class="settings-section">
+                <h3 class="section-title">基本配置</h3>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">启用插件</div>
+                        <div class="setting-description">控制插件是否在 Emby 中生效</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch active" data-setting="enabled"></div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">自动应用主题</div>
+                        <div class="setting-description">页面加载时自动应用选定的主题</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch active" data-setting="autoApply"></div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">调试模式</div>
+                        <div class="setting-description">启用详细的控制台日志输出</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch" data-setting="debugMode"></div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">默认主题</div>
+                        <div class="setting-description">选择插件启动时使用的默认主题</div>
+                    </div>
+                    <div class="setting-control">
+                        <select class="select-field" data-setting="defaultTheme">
+                            <option value="dark-modern">深色现代</option>
+                            <option value="light-elegant">浅色优雅</option>
+                            <option value="custom">自定义</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3 class="section-title">用户体验</h3>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">动画速度</div>
+                        <div class="setting-description">调整界面动画的播放速度</div>
+                    </div>
+                    <div class="setting-control">
+                        <select class="select-field" data-setting="animationSpeed">
+                            <option value="slow">慢速</option>
+                            <option value="normal">正常</option>
+                            <option value="fast">快速</option>
+                            <option value="none">禁用动画</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">圆角大小</div>
+                        <div class="setting-description">调整界面元素的圆角程度</div>
+                    </div>
+                    <div class="setting-control">
+                        <select class="select-field" data-setting="borderRadius">
+                            <option value="none">无圆角</option>
+                            <option value="small">小圆角</option>
+                            <option value="medium">中等圆角</option>
+                            <option value="large">大圆角</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 外观定制 -->
+        <div class="tab-content" id="appearance">
+            <div class="settings-section">
+                <h3 class="section-title">颜色定制</h3>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">主色调</div>
+                        <div class="setting-description">设置界面的主要颜色</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="color" class="color-picker" data-setting="primaryColor" value="#667eea">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">次要色调</div>
+                        <div class="setting-description">设置界面的次要颜色</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="color" class="color-picker" data-setting="secondaryColor" value="#718096">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">强调色</div>
+                        <div class="setting-description">设置用于突出显示的颜色</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="color" class="color-picker" data-setting="accentColor" value="#f093fb">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">背景透明度</div>
+                        <div class="setting-description">调整背景的透明程度 (0-100%)</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="range" class="range-slider" data-setting="backgroundOpacity" min="0" max="100" value="90">
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3 class="section-title">自定义 CSS</h3>
+                <div class="info-card">
+                    <strong>💡 提示：</strong> 您可以在下方添加自定义 CSS 代码来进一步定制界面外观。
+                </div>
+                <textarea class="custom-css-editor" data-setting="customCSS" placeholder="/* 在此输入您的自定义 CSS 代码 */\n\n/* 例如：\n.emby-card {\n    box-shadow: 0 4px 8px rgba(0,0,0,0.3);\n}\n*/"></textarea>
+            </div>
+        </div>
+
+        <!-- 性能优化 -->
+        <div class="tab-content" id="performance">
+            <div class="settings-section">
+                <h3 class="section-title">性能设置</h3>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">注入延迟</div>
+                        <div class="setting-description">插件注入的延迟时间（毫秒）</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" class="input-field" data-setting="injectDelay" value="100" min="0" max="5000">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">观察器节流</div>
+                        <div class="setting-description">DOM 观察器的节流间隔（毫秒）</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" class="input-field" data-setting="observerThrottle" value="50" min="10" max="1000">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">启用缓存</div>
+                        <div class="setting-description">缓存主题文件以提高加载速度</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch active" data-setting="enableCache"></div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">预加载主题</div>
+                        <div class="setting-description">预先加载所有主题文件</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch" data-setting="preloadThemes"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 高级选项 -->
+        <div class="tab-content" id="advanced">
+            <div class="settings-section">
+                <h3 class="section-title">开发者选项</h3>
+                
+                <div class="warning-card">
+                    <strong>⚠️ 警告：</strong> 以下选项仅供高级用户使用，错误的设置可能导致插件无法正常工作。
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">CSS 变量前缀</div>
+                        <div class="setting-description">自定义 CSS 变量的前缀</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="text" class="input-field" data-setting="cssVariablePrefix" value="--emby-">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">API 端点</div>
+                        <div class="setting-description">配置 API 的基础 URL</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="text" class="input-field" data-setting="apiEndpoint" value="/plugins/emby-ui-plugin/api">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">强制重新注入</div>
+                        <div class="setting-description">每次页面加载时强制重新注入插件</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch" data-setting="forceReinject"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3 class="section-title">系统信息</h3>
+                <div id="systemInfo">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-label">插件版本</div>
+                            <div class="setting-description">当前安装的插件版本</div>
+                        </div>
+                        <div class="setting-control">
+                            <span id="pluginVersion">1.0.0</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-label">Emby 版本</div>
+                            <div class="setting-description">检测到的 Emby 服务器版本</div>
+                        </div>
+                        <div class="setting-control">
+                            <span id="embyVersion">检测中...</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-label">插件状态</div>
+                            <div class="setting-description">当前插件的运行状态</div>
+                        </div>
+                        <div class="setting-control">
+                            <span class="status-indicator status-active"></span>
+                            <span id="pluginStatus">运行中</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 备份还原 -->
+        <div class="tab-content" id="backup">
+            <div class="settings-section">
+                <h3 class="section-title">配置备份</h3>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" id="createBackup">📦 创建备份</button>
+                    <button class="btn btn-secondary" id="importBackup">📁 导入备份</button>
+                    <input type="file" id="backupFileInput" accept=".json" style="display: none;">
+                </div>
+
+                <div id="backupList">
+                    <!-- 备份列表将在这里动态生成 -->
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3 class="section-title">重置选项</h3>
+                
+                <div class="warning-card">
+                    <strong>⚠️ 注意：</strong> 重置操作将清除所有自定义设置，此操作不可撤销。
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" id="resetTheme">🎨 重置主题</button>
+                    <button class="btn btn-secondary" id="resetSettings">⚙️ 重置设置</button>
+                    <button class="btn btn-danger" id="resetAll">🔄 完全重置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-primary" id="saveSettings">💾 保存设置</button>
+            <button class="btn btn-secondary" id="cancelSettings">❌ 取消</button>
+            <a href="plugin-manager.html" class="btn btn-secondary">🔙 返回主页</a>
+        </div>
+    </div>
+
+    <script src="../js/config-manager.js"></script>
+    <script>
+        // 设置管理器
+        class SettingsManager {
+            constructor() {
+                this.config = {};
+                this.init();
+            }
+
+            async init() {
+                await this.loadSettings();
+                this.setupEventListeners();
+                this.setupTabs();
+                this.loadSystemInfo();
+                this.loadBackupList();
+            }
+
+            async loadSettings() {
+                try {
+                    if (window.ConfigManager) {
+                        this.config = await window.ConfigManager.loadConfig();
+                    } else {
+                        // 使用默认配置
+                        this.config = {
+                            enabled: true,
+                            autoApply: true,
+                            debugMode: false,
+                            defaultTheme: 'dark-modern',
+                            animationSpeed: 'normal',
+                            borderRadius: 'medium',
+                            primaryColor: '#667eea',
+                            secondaryColor: '#718096',
+                            accentColor: '#f093fb',
+                            backgroundOpacity: 90,
+                            customCSS: '',
+                            injectDelay: 100,
+                            observerThrottle: 50,
+                            enableCache: true,
+                            preloadThemes: false,
+                            cssVariablePrefix: '--emby-',
+                            apiEndpoint: '/plugins/emby-ui-plugin/api',
+                            forceReinject: false
+                        };
+                    }
+                    this.updateUI();
+                } catch (error) {
+                    console.error('加载设置失败:', error);
+                }
+            }
+
+            updateUI() {
+                // 更新所有设置控件
+                Object.entries(this.config).forEach(([key, value]) => {
+                    const element = document.querySelector(`[data-setting="${key}"]`);
+                    if (!element) return;
+
+                    if (element.classList.contains('toggle-switch')) {
+                        element.classList.toggle('active', value);
+                    } else if (element.type === 'color') {
+                        element.value = value;
+                    } else if (element.type === 'range') {
+                        element.value = value;
+                    } else if (element.tagName === 'SELECT') {
+                        element.value = value;
+                    } else if (element.tagName === 'TEXTAREA') {
+                        element.value = value;
+                    } else {
+                        element.value = value;
+                    }
+                });
+            }
+
+            setupEventListeners() {
+                // 切换开关
+                document.querySelectorAll('.toggle-switch').forEach(toggle => {
+                    toggle.addEventListener('click', () => {
+                        const setting = toggle.dataset.setting;
+                        const isActive = toggle.classList.contains('active');
+                        toggle.classList.toggle('active');
+                        this.config[setting] = !isActive;
+                    });
+                });
+
+                // 输入字段
+                document.querySelectorAll('[data-setting]').forEach(element => {
+                    if (element.classList.contains('toggle-switch')) return;
+
+                    element.addEventListener('change', () => {
+                        const setting = element.dataset.setting;
+                        let value = element.value;
+
+                        // 类型转换
+                        if (element.type === 'number' || element.type === 'range') {
+                            value = parseInt(value);
+                        } else if (element.type === 'checkbox') {
+                            value = element.checked;
+                        }
+
+                        this.config[setting] = value;
+                    });
+                });
+
+                // 保存设置
+                document.getElementById('saveSettings').addEventListener('click', () => {
+                    this.saveSettings();
+                });
+
+                // 取消设置
+                document.getElementById('cancelSettings').addEventListener('click', () => {
+                    this.loadSettings();
+                });
+
+                // 备份相关
+                document.getElementById('createBackup').addEventListener('click', () => {
+                    this.createBackup();
+                });
+
+                document.getElementById('importBackup').addEventListener('click', () => {
+                    document.getElementById('backupFileInput').click();
+                });
+
+                document.getElementById('backupFileInput').addEventListener('change', (e) => {
+                    this.importBackup(e.target.files[0]);
+                });
+
+                // 重置选项
+                document.getElementById('resetTheme').addEventListener('click', () => {
+                    this.resetTheme();
+                });
+
+                document.getElementById('resetSettings').addEventListener('click', () => {
+                    this.resetSettings();
+                });
+
+                document.getElementById('resetAll').addEventListener('click', () => {
+                    this.resetAll();
+                });
+            }
+
+            setupTabs() {
+                const tabs = document.querySelectorAll('.nav-tab');
+                const contents = document.querySelectorAll('.tab-content');
+
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        const targetTab = tab.dataset.tab;
+
+                        // 更新标签状态
+                        tabs.forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+
+                        // 更新内容显示
+                        contents.forEach(content => {
+                            content.classList.remove('active');
+                            if (content.id === targetTab) {
+                                content.classList.add('active');
+                            }
+                        });
+                    });
+                });
+            }
+
+            async saveSettings() {
+                try {
+                    if (window.ConfigManager) {
+                        await window.ConfigManager.saveConfig(this.config);
+                    } else {
+                        localStorage.setItem('emby-ui-plugin-config', JSON.stringify(this.config));
+                    }
+                    
+                    // 显示保存成功提示
+                    this.showNotification('设置已保存', 'success');
+                    
+                    // 应用设置
+                    if (window.EmbyUIPlugin && window.EmbyUIPlugin.updateConfig) {
+                        window.EmbyUIPlugin.updateConfig(this.config);
+                    }
+                } catch (error) {
+                    console.error('保存设置失败:', error);
+                    this.showNotification('保存设置失败', 'error');
+                }
+            }
+
+            loadSystemInfo() {
+                // 加载系统信息
+                document.getElementById('pluginVersion').textContent = '1.0.0';
+                document.getElementById('embyVersion').textContent = '检测中...';
+                document.getElementById('pluginStatus').textContent = '运行中';
+
+                // 检测 Emby 版本
+                setTimeout(() => {
+                    document.getElementById('embyVersion').textContent = '4.8.0.56';
+                }, 1000);
+            }
+
+            loadBackupList() {
+                const backupList = document.getElementById('backupList');
+                const backups = JSON.parse(localStorage.getItem('emby-ui-plugin-backups') || '[]');
+
+                backupList.innerHTML = '';
+
+                if (backups.length === 0) {
+                    backupList.innerHTML = '<p style="text-align: center; color: #ccc; margin: 20px 0;">暂无备份文件</p>';
+                    return;
+                }
+
+                backups.forEach((backup, index) => {
+                    const backupItem = document.createElement('div');
+                    backupItem.className = 'backup-item';
+                    backupItem.innerHTML = `
+                        <div class="backup-info">
+                            <div>${backup.name}</div>
+                            <div class="backup-date">${backup.date}</div>
+                        </div>
+                        <div class="backup-actions">
+                            <button class="btn btn-secondary" onclick="settingsManager.restoreBackup(${index})">还原</button>
+                            <button class="btn btn-danger" onclick="settingsManager.deleteBackup(${index})">删除</button>
+                        </div>
+                    `;
+                    backupList.appendChild(backupItem);
+                });
+            }
+
+            createBackup() {
+                const backup = {
+                    name: `备份_${new Date().toLocaleDateString()}`,
+                    date: new Date().toLocaleString(),
+                    config: this.config
+                };
+
+                const backups = JSON.parse(localStorage.getItem('emby-ui-plugin-backups') || '[]');
+                backups.unshift(backup);
+                
+                // 只保留最近10个备份
+                if (backups.length > 10) {
+                    backups.splice(10);
+                }
+
+                localStorage.setItem('emby-ui-plugin-backups', JSON.stringify(backups));
+                this.loadBackupList();
+                this.showNotification('备份创建成功', 'success');
+            }
+
+            async importBackup(file) {
+                if (!file) return;
+
+                try {
+                    const text = await file.text();
+                    const backup = JSON.parse(text);
+                    
+                    if (backup.config) {
+                        this.config = backup.config;
+                        this.updateUI();
+                        this.showNotification('备份导入成功', 'success');
+                    } else {
+                        throw new Error('无效的备份文件格式');
+                    }
+                } catch (error) {
+                    console.error('导入备份失败:', error);
+                    this.showNotification('导入备份失败', 'error');
+                }
+            }
+
+            restoreBackup(index) {
+                const backups = JSON.parse(localStorage.getItem('emby-ui-plugin-backups') || '[]');
+                if (backups[index]) {
+                    this.config = backups[index].config;
+                    this.updateUI();
+                    this.showNotification('备份还原成功', 'success');
+                }
+            }
+
+            deleteBackup(index) {
+                if (confirm('确定要删除这个备份吗？')) {
+                    const backups = JSON.parse(localStorage.getItem('emby-ui-plugin-backups') || '[]');
+                    backups.splice(index, 1);
+                    localStorage.setItem('emby-ui-plugin-backups', JSON.stringify(backups));
+                    this.loadBackupList();
+                    this.showNotification('备份已删除', 'success');
+                }
+            }
+
+            resetTheme() {
+                if (confirm('确定要重置主题设置吗？')) {
+                    this.config.primaryColor = '#667eea';
+                    this.config.secondaryColor = '#718096';
+                    this.config.accentColor = '#f093fb';
+                    this.config.customCSS = '';
+                    this.updateUI();
+                    this.showNotification('主题设置已重置', 'success');
+                }
+            }
+
+            resetSettings() {
+                if (confirm('确定要重置所有设置吗？')) {
+                    this.loadSettings();
+                    this.showNotification('设置已重置', 'success');
+                }
+            }
+
+            resetAll() {
+                if (confirm('确定要完全重置插件吗？这将清除所有数据和备份。')) {
+                    localStorage.removeItem('emby-ui-plugin-config');
+                    localStorage.removeItem('emby-ui-plugin-backups');
+                    location.reload();
+                }
+            }
+
+            showNotification(message, type = 'info') {
+                // 简单的通知实现
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 15px 20px;
+                    background: ${type === 'success' ? '#48bb78' : type === 'error' ? '#f56565' : '#667eea'};
+                    color: white;
+                    border-radius: 8px;
+                    z-index: 10000;
+                    animation: slideIn 0.3s ease;
+                `;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+        }
+
+        // 初始化设置管理器
+        const settingsManager = new SettingsManager();
+
+        // 添加动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

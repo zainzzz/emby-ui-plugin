@@ -1,0 +1,306 @@
+/* Emby UI Plugin - Light Elegant Theme */
+/* 浅色优雅主题 - 适合日间使用的清新简洁界面 */
+
+:root {
+  /* 主色调 */
+  --primary-color: #3b82f6;
+  --secondary-color: #8b5cf6;
+  --background-color: #ffffff;
+  --surface-color: #f8fafc;
+  
+  /* 文字颜色 */
+  --text-color: #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  
+  /* 边框和分割线 */
+  --border-color: #e5e7eb;
+  --divider-color: #d1d5db;
+  
+  /* 功能色彩 */
+  --accent-color: #2563eb;
+  --success-color: #059669;
+  --warning-color: #d97706;
+  --error-color: #dc2626;
+  
+  /* 卡片和容器 */
+  --card-background: #ffffff;
+  --card-hover: #f1f5f9;
+  --modal-background: #ffffff;
+  
+  /* 交互状态 */
+  --hover-color: #1d4ed8;
+  --active-color: #1e40af;
+  --focus-color: #3b82f6;
+  
+  /* 布局参数 */
+  --border-radius: 8px;
+  --card-spacing: 16px;
+  --animation-speed: 0.3s;
+}
+
+/* 全局样式重置 */
+body {
+  background-color: var(--background-color) !important;
+  color: var(--text-color) !important;
+  font-family: 'Roboto', 'Noto Sans SC', sans-serif !important;
+}
+
+/* 主容器样式 */
+.mainDrawer,
+.mainContent {
+  background-color: var(--background-color) !important;
+}
+
+/* 导航栏美化 */
+.skinHeader {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.headerTop {
+  background: transparent !important;
+}
+
+/* 侧边栏美化 */
+.mainDrawer-scrollContainer {
+  background-color: var(--surface-color) !important;
+  border-right: 1px solid var(--border-color);
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+.navMenuOption {
+  color: var(--text-secondary) !important;
+  border-radius: var(--border-radius);
+  margin: 4px 8px;
+  transition: all var(--animation-speed) ease;
+}
+
+.navMenuOption:hover {
+  background-color: var(--card-hover) !important;
+  color: var(--text-color) !important;
+  transform: translateX(4px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.navMenuOption.selectedMediaFolder,
+.navMenuOption.ui-btn-active {
+  background-color: var(--accent-color) !important;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important;
+}
+
+/* 卡片样式美化 */
+.card,
+.cardBox {
+  background-color: var(--card-background) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  transition: all var(--animation-speed) ease !important;
+  margin: var(--card-spacing) !important;
+}
+
+.card:hover,
+.cardBox:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+  border-color: var(--accent-color) !important;
+}
+
+/* 按钮美化 */
+.button-flat,
+.btnOption,
+.raised {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: var(--border-radius) !important;
+  padding: 8px 16px !important;
+  font-weight: 500 !important;
+  transition: all var(--animation-speed) ease !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.button-flat:hover,
+.btnOption:hover,
+.raised:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+  filter: brightness(1.05) !important;
+}
+
+/* 输入框美化 */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+textarea,
+select {
+  background-color: var(--card-background) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--border-radius) !important;
+  color: var(--text-color) !important;
+  padding: 8px 12px !important;
+  transition: all var(--animation-speed) ease !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--focus-color) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  outline: none !important;
+}
+
+/* 模态框美化 */
+.dialog,
+.formDialogContent {
+  background-color: var(--modal-background) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: calc(var(--border-radius) * 2) !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+.dialogHeader {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+  color: white !important;
+  border-radius: calc(var(--border-radius) * 2) calc(var(--border-radius) * 2) 0 0 !important;
+}
+
+/* 进度条美化 */
+.mdl-progress {
+  background-color: var(--border-color) !important;
+}
+
+.mdl-progress > .progressbar {
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)) !important;
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--hover-color);
+}
+
+/* 媒体项目网格美化 */
+.itemsContainer {
+  gap: var(--card-spacing) !important;
+}
+
+.cardContent {
+  background-color: var(--card-background) !important;
+  border-radius: 0 0 var(--border-radius) var(--border-radius) !important;
+}
+
+.cardImageContainer {
+  border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+  overflow: hidden !important;
+}
+
+/* 播放按钮美化 */
+.cardOverlayButton {
+  background: rgba(59, 130, 246, 0.9) !important;
+  border: 2px solid var(--accent-color) !important;
+  border-radius: 50% !important;
+  transition: all var(--animation-speed) ease !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.cardOverlayButton:hover {
+  background: var(--accent-color) !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* 标签和徽章美化 */
+.itemTag,
+.mediaInfoItem {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+  color: white !important;
+  border-radius: calc(var(--border-radius) / 2) !important;
+  padding: 2px 8px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  :root {
+    --card-spacing: 8px;
+    --border-radius: 6px;
+  }
+  
+  .card,
+  .cardBox {
+    margin: 4px !important;
+  }
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card,
+.cardBox {
+  animation: fadeIn var(--animation-speed) ease-out;
+}
+
+/* 加载状态美化 */
+.mdl-spinner {
+  border-color: var(--accent-color) transparent var(--accent-color) transparent !important;
+}
+
+/* 通知和提示美化 */
+.toast {
+  background-color: var(--card-background) !important;
+  color: var(--text-color) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 搜索框美化 */
+.searchFields {
+  background-color: var(--surface-color) !important;
+  border-radius: var(--border-radius) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+/* 菜单美化 */
+.contextMenu {
+  background-color: var(--card-background) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.contextMenuItem:hover {
+  background-color: var(--card-hover) !important;
+  color: var(--text-color) !important;
+}

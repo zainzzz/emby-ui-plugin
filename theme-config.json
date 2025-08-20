@@ -1,0 +1,60 @@
+{
+  "themes": [
+    {
+      "id": "dark-modern",
+      "name": "深色现代",
+      "description": "现代化的深色主题，适合夜间使用，提供舒适的视觉体验",
+      "cssFile": "themes/dark-modern.css",
+      "previewImage": "themes/previews/dark-modern.jpg",
+      "category": "dark",
+      "variables": {
+        "--primary-color": "#1e3a8a",
+        "--secondary-color": "#7c3aed",
+        "--background-color": "#0f172a",
+        "--surface-color": "#1e293b",
+        "--text-color": "#f8fafc",
+        "--text-secondary": "#cbd5e1",
+        "--border-color": "#334155",
+        "--accent-color": "#3b82f6",
+        "--success-color": "#10b981",
+        "--warning-color": "#f59e0b",
+        "--error-color": "#ef4444",
+        "--card-background": "#1e293b",
+        "--hover-color": "#2563eb"
+      }
+    },
+    {
+      "id": "light-elegant",
+      "name": "浅色优雅",
+      "description": "优雅的浅色主题，适合日间使用，清新简洁的设计风格",
+      "cssFile": "themes/light-elegant.css",
+      "previewImage": "themes/previews/light-elegant.jpg",
+      "category": "light",
+      "variables": {
+        "--primary-color": "#3b82f6",
+        "--secondary-color": "#8b5cf6",
+        "--background-color": "#ffffff",
+        "--surface-color": "#f8fafc",
+        "--text-color": "#1f2937",
+        "--text-secondary": "#6b7280",
+        "--border-color": "#e5e7eb",
+        "--accent-color": "#2563eb",
+        "--success-color": "#059669",
+        "--warning-color": "#d97706",
+        "--error-color": "#dc2626",
+        "--card-background": "#ffffff",
+        "--hover-color": "#1d4ed8"
+      }
+    }
+  ],
+  "defaultTheme": "dark-modern",
+  "customizableProperties": [
+    "--primary-color",
+    "--secondary-color",
+    "--accent-color",
+    "--card-background",
+    "--border-radius",
+    "--card-spacing",
+    "--animation-speed"
+  ]
+}

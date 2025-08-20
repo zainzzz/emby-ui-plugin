@@ -1,0 +1,107 @@
+version: '3.8'
+
+services:
+  emby-ui-enhanced:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: emby-ui-enhanced
+    restart: unless-stopped
+    
+    # 网络配置
+    network_mode: bridge
+    ports:
+      - "8096:8096"     # HTTP端口
+      - "8920:8920"     # HTTPS端口
+      - "1900:1900/udp" # DLNA端口
+      - "7359:7359/udp" # 自动发现端口
+    
+    # 环境变量
+    environment:
+      - PUID=1000                    # 用户ID
+      - PGID=1000                    # 组ID
+      - TZ=Asia/Shanghai             # 时区
+      - UMASK_SET=022                # 文件权限掩码
+      
+      # Emby UI Plugin 配置
+      - EMBY_UI_PLUGIN_ENABLED=true
+      - EMBY_UI_PLUGIN_THEME=dark-modern
+      - EMBY_UI_PLUGIN_AUTO_APPLY=true
+      - EMBY_UI_PLUGIN_DEBUG=false
+    
+    # 数据卷映射
+    volumes:
+      # Emby配置目录
+      - ./config:/config
+      
+      # 媒体库目录（根据实际情况修改）
+      - ./media/movies:/data/movies
+      - ./media/tvshows:/data/tvshows
+      - ./media/music:/data/music
+      
+      # 可选：额外媒体目录
+      # - /path/to/your/media:/data/media
+      
+      # 插件配置目录（可选，用于持久化插件配置）
+      - ./plugin-config:/config/plugins/emby-ui-plugin/config
+    
+    # 设备映射（可选，用于硬件转码）
+    devices:
+      # Intel Quick Sync Video
+      # - /dev/dri:/dev/dri
+      
+      # NVIDIA GPU（需要nvidia-docker2）
+      # - /dev/nvidia0:/dev/nvidia0
+      # - /dev/nvidiactl:/dev/nvidiactl
+      # - /dev/nvidia-modeset:/dev/nvidia-modeset
+      # - /dev/nvidia-uvm:/dev/nvidia-uvm
+      # - /dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools
+    
+    # 资源限制
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8096/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    
+    # 日志配置
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # 标签
+    labels:
+      - "com.emby.ui.plugin=true"
+      - "com.emby.ui.plugin.version=1.0.0"
+      - "traefik.enable=true"
+      - "traefik.http.routers.emby.rule=Host(`emby.yourdomain.com`)"
+      - "traefik.http.routers.emby.tls=true"
+      - "traefik.http.services.emby.loadbalancer.server.port=8096"
+
+# 网络配置（可选）
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# 数据卷配置（可选）
+volumes:
+  emby-config:
+    driver: local
+  emby-data:
+    driver: local

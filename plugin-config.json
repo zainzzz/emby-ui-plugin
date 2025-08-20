@@ -1,0 +1,21 @@
+{
+  "id": "emby-ui-plugin",
+  "name": "Emby UI美化插件",
+  "version": "1.0.0",
+  "description": "专为Emby媒体服务器设计的界面美化插件，提供现代化主题和个性化定制选项",
+  "author": "Emby UI Team",
+  "enabled": true,
+  "settings": {
+    "defaultTheme": "dark-modern",
+    "allowUserCustomization": true,
+    "autoUpdate": false,
+    "enableAnimations": true,
+    "debugMode": false
+  },
+  "supportedEmbyVersions": [
+    "4.7.0",
+    "4.8.0"
+  ],
+  "dependencies": [],
+  "installationPath": "/config/plugins/EmbyUIPlugin"
+}
