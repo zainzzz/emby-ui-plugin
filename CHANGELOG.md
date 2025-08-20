@@ -218,8 +218,8 @@
 
 如果您遇到问题或有建议：
 
-- 🐛 **Bug 报告**：[GitHub Issues](https://github.com/your-repo/emby-ui-plugin/issues)
-- 💡 **功能请求**：[GitHub Discussions](https://github.com/your-repo/emby-ui-plugin/discussions)
+- 🐛 **Bug 报告**：[GitHub Issues](https://github.com/zainzzz/emby-ui-plugin/issues)
+- 💡 **功能请求**：[GitHub Discussions](https://github.com/zainzzz/emby-ui-plugin/discussions)
 - 📧 **邮件支持**：support@example.com
 - 💬 **社区讨论**：[Discord](https://discord.gg/your-server)
 

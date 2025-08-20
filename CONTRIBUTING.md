@@ -87,11 +87,11 @@
    ```bash
    # Fork 项目到您的 GitHub 账户
    # 然后克隆您的 fork
-   git clone https://github.com/YOUR_USERNAME/emby-ui-plugin.git
+   git clone https://github.com/zainzzz/emby-ui-plugin.git
    cd emby-ui-plugin
    
    # 添加上游仓库
-   git remote add upstream https://github.com/original-repo/emby-ui-plugin.git
+   git remote add upstream https://github.com/zainzzz/emby-ui-plugin.git
    ```
 
 2. **安装依赖**
@@ -345,7 +345,7 @@ git push origin feature/your-feature-name
 
 ### 报告 Bug
 
-使用 [GitHub Issues](https://github.com/your-repo/emby-ui-plugin/issues) 报告 Bug。
+使用 [GitHub Issues](https://github.com/zainzzz/emby-ui-plugin/issues) 报告 Bug。
 
 **Bug 报告应包含：**
 
@@ -404,7 +404,7 @@ git push origin feature/your-feature-name
 
 ### 提出新功能
 
-使用 [GitHub Discussions](https://github.com/your-repo/emby-ui-plugin/discussions) 讨论新功能想法。
+使用 [GitHub Discussions](https://github.com/zainzzz/emby-ui-plugin/discussions) 讨论新功能想法。
 
 **功能请求应包含：**
 
@@ -466,9 +466,9 @@ git push origin feature/your-feature-name
 
 如果您在贡献过程中遇到问题：
 
-- 💬 **GitHub Discussions**：[项目讨论区](https://github.com/your-repo/emby-ui-plugin/discussions)
-- 📧 **邮件联系**：dev@example.com
-- 🐛 **问题报告**：[GitHub Issues](https://github.com/your-repo/emby-ui-plugin/issues)
+- 💬 **GitHub Discussions**：[项目讨论区](https://github.com/zainzzz/emby-ui-plugin/discussions)
+- 📧 **邮箱**：support@example.com
+- 🐛 **问题报告**：[GitHub Issues](https://github.com/zainzzz/emby-ui-plugin/issues)
 - 💭 **实时聊天**：[Discord 服务器](https://discord.gg/your-server)
 
 ## 🙏 感谢

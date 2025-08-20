@@ -26,7 +26,7 @@
 
 1. **下载项目文件**
    ```bash
-   git clone https://github.com/your-username/emby-ui-plugin.git
+   git clone https://github.com/zainzzz/emby-ui-plugin.git
    cd emby-ui-plugin
    ```
 
@@ -51,7 +51,7 @@
 
 1. **下载插件文件**
    ```bash
-   wget https://github.com/your-username/emby-ui-plugin/releases/latest/download/emby-ui-plugin.tar.gz
+   wget https://github.com/zainzzz/emby-ui-plugin/releases/latest/download/emby-ui-plugin.tar.gz
    tar -xzf emby-ui-plugin.tar.gz
    ```
 
@@ -299,8 +299,8 @@ docker-compose logs -f
 
 如果您遇到问题或有建议，请通过以下方式联系我们：
 
-- **GitHub Issues**：[提交问题](https://github.com/your-username/emby-ui-plugin/issues)
-- **讨论区**：[GitHub Discussions](https://github.com/your-username/emby-ui-plugin/discussions)
+- **GitHub Issues**：[提交问题](https://github.com/zainzzz/emby-ui-plugin/issues)
+- **讨论区**：[GitHub Discussions](https://github.com/zainzzz/emby-ui-plugin/discussions)
 - **邮箱**：support@example.com
 
 ## 🗺️ 路线图

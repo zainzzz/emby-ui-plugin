@@ -27,12 +27,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/emby-ui-beautification-plugin.git"
+    "url": "https://github.com/zainzzz/emby-ui-plugin.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/emby-ui-beautification-plugin/issues"
+    "url": "https://github.com/zainzzz/emby-ui-plugin/issues"
   },
-  "homepage": "https://github.com/your-username/emby-ui-beautification-plugin#readme",
+  "homepage": "https://github.com/zainzzz/emby-ui-plugin#readme",
   "engines": {
     "node": ">=14.0.0"
   },

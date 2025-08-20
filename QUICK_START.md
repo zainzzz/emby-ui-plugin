@@ -12,7 +12,7 @@
 
 ### 1. 下载项目
 ```bash
-git clone https://github.com/your-repo/emby-ui-plugin.git
+git clone https://github.com/zainzzz/emby-ui-plugin.git
 cd emby-ui-plugin
 ```
 
@@ -48,7 +48,7 @@ docker-compose logs -f
 1. **下载插件**
    ```powershell
    # 下载到本地目录
-   git clone https://github.com/your-repo/emby-ui-plugin.git
+   git clone https://github.com/zainzzz/emby-ui-plugin.git
    cd emby-ui-plugin
    ```
 
@@ -69,7 +69,7 @@ docker-compose logs -f
 
 1. **下载插件**
    ```bash
-   git clone https://github.com/your-repo/emby-ui-plugin.git
+   git clone https://github.com/zainzzz/emby-ui-plugin.git
    cd emby-ui-plugin
    ```
 
@@ -205,8 +205,8 @@ sudo systemctl restart emby-server
 ## 📞 获取帮助
 
 - 📖 **完整文档**：[README.md](./README.md)
-- 🐛 **问题反馈**：[GitHub Issues](https://github.com/your-repo/emby-ui-plugin/issues)
-- 💬 **社区讨论**：[GitHub Discussions](https://github.com/your-repo/emby-ui-plugin/discussions)
+- 🐛 **问题反馈**：[GitHub Issues](https://github.com/zainzzz/emby-ui-plugin/issues)
+- 💬 **社区讨论**：[GitHub Discussions](https://github.com/zainzzz/emby-ui-plugin/discussions)
 - 📧 **邮件支持**：support@example.com
 
 ---
