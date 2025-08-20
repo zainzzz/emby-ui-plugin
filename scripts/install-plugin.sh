@@ -49,254 +49,277 @@ check_requirements() {
         log_info "检测到sudo，将使用sudo执行特权操作"
         SUDO="sudo"
     else
-        log_error "需要root权限或sudo来安装插件"
+        log_error "需要root权限或sudo权限来安装插件"
         exit 1
     fi
     
-    # 检查必要的命令
-    local required_commands=("cp" "mkdir" "chmod" "chown")
-    for cmd in "${required_commands[@]}"; do
+    # 检查必需的命令
+    local required_commands="cp mkdir chmod chown"
+    for cmd in $required_commands; do
         if ! command -v "$cmd" >/dev/null 2>&1; then
-            log_error "缺少必要命令: $cmd"
+            log_error "缺少必需的命令: $cmd"
             exit 1
         fi
     done
     
-    log_success "要求检查完成"
+    log_success "所有要求检查通过"
 }
 
-# 创建目录
+# 创建目录函数
 create_directories() {
-    log_info "创建插件目录..."
+    log_info "创建必要的目录..."
     
-    # 创建插件配置目录
-    $SUDO mkdir -p "$PLUGIN_INSTALL_PATH"
-    $SUDO mkdir -p "$PLUGIN_INSTALL_PATH/themes"
-    $SUDO mkdir -p "$PLUGIN_INSTALL_PATH/js"
-    $SUDO mkdir -p "$PLUGIN_INSTALL_PATH/pages"
-    $SUDO mkdir -p "$PLUGIN_INSTALL_PATH/config"
-    $SUDO mkdir -p "$PLUGIN_INSTALL_PATH/logs"
+    local directories=(
+        "$PLUGIN_INSTALL_PATH"
+        "$WEB_PLUGIN_PATH"
+        "$WEB_PLUGIN_PATH/themes"
+        "$WEB_PLUGIN_PATH/js"
+        "$WEB_PLUGIN_PATH/api"
+        "$WEB_PLUGIN_PATH/pages"
+    )
     
-    # 创建Web插件目录
-    $SUDO mkdir -p "$WEB_PLUGIN_PATH"
+    for dir in "${directories[@]}"; do
+        if [ ! -d "$dir" ]; then
+            $SUDO mkdir -p "$dir"
+            log_info "创建目录: $dir"
+        fi
+    done
     
     log_success "目录创建完成"
 }
 
-# 复制插件文件
+# 复制文件函数
 copy_plugin_files() {
     log_info "复制插件文件..."
     
-    if [[ ! -d "$PLUGIN_SOURCE_PATH" ]]; then
-        log_error "插件源目录不存在: $PLUGIN_SOURCE_PATH"
-        exit 1
+    local current_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local plugin_root="$(dirname "$current_dir")"
+    
+    # 复制主题文件
+    if [ -d "$plugin_root/themes" ]; then
+        $SUDO cp -r "$plugin_root/themes/"* "$WEB_PLUGIN_PATH/themes/"
+        log_info "复制主题文件"
     fi
     
-    # 复制主要文件
-    $SUDO cp -r "$PLUGIN_SOURCE_PATH/themes/" "$PLUGIN_INSTALL_PATH/"
-    $SUDO cp -r "$PLUGIN_SOURCE_PATH/js/" "$PLUGIN_INSTALL_PATH/"
-    $SUDO cp -r "$PLUGIN_SOURCE_PATH/pages/" "$PLUGIN_INSTALL_PATH/"
+    # 复制JavaScript文件
+    if [ -d "$plugin_root/src/js" ]; then
+        $SUDO cp -r "$plugin_root/src/js/"* "$WEB_PLUGIN_PATH/js/"
+        log_info "复制JavaScript文件"
+    fi
+    
+    # 复制API文件
+    if [ -d "$plugin_root/api" ]; then
+        $SUDO cp -r "$plugin_root/api/"* "$WEB_PLUGIN_PATH/api/"
+        log_info "复制API文件"
+    fi
+    
+    # 复制页面文件
+    if [ -d "$plugin_root/pages" ]; then
+        $SUDO cp -r "$plugin_root/pages/"* "$WEB_PLUGIN_PATH/pages/"
+        log_info "复制页面文件"
+    fi
     
     # 复制配置文件
-    $SUDO cp "$PLUGIN_SOURCE_PATH/plugin-config.json" "$PLUGIN_INSTALL_PATH/"
-    $SUDO cp "$PLUGIN_SOURCE_PATH/theme-config.json" "$PLUGIN_INSTALL_PATH/"
+    if [ -f "$plugin_root/plugin-config.json" ]; then
+        $SUDO cp "$plugin_root/plugin-config.json" "$WEB_PLUGIN_PATH/"
+        log_info "复制配置文件"
+    fi
     
-    # 复制到Web目录（用于Web访问）
-    $SUDO cp -r "$PLUGIN_SOURCE_PATH/themes/" "$WEB_PLUGIN_PATH/"
-    $SUDO cp -r "$PLUGIN_SOURCE_PATH/js/" "$WEB_PLUGIN_PATH/"
-    $SUDO cp -r "$PLUGIN_SOURCE_PATH/pages/" "$WEB_PLUGIN_PATH/"
+    # 复制package.json
+    if [ -f "$plugin_root/package.json" ]; then
+        $SUDO cp "$plugin_root/package.json" "$WEB_PLUGIN_PATH/"
+        log_info "复制package.json"
+    fi
     
     log_success "文件复制完成"
 }
 
-# 设置权限
-set_permissions() {
-    log_info "设置文件权限..."
-    
-    # 设置插件目录权限
-    $SUDO chown -R abc:abc "$PLUGIN_INSTALL_PATH"
-    $SUDO chmod -R 755 "$PLUGIN_INSTALL_PATH"
-    
-    # 设置Web目录权限
-    $SUDO chown -R abc:abc "$WEB_PLUGIN_PATH"
-    $SUDO chmod -R 755 "$WEB_PLUGIN_PATH"
-    
-    # 设置配置文件权限
-    $SUDO chmod 644 "$PLUGIN_INSTALL_PATH/plugin-config.json"
-    $SUDO chmod 644 "$PLUGIN_INSTALL_PATH/theme-config.json"
-    
-    log_success "权限设置完成"
-}
-
-# 创建插件注入脚本
+# 创建注入脚本
 create_injection_script() {
-    log_info "创建插件注入脚本..."
+    log_info "创建注入脚本..."
     
-    local injection_script="$PLUGIN_INSTALL_PATH/inject.js"
+    local inject_script="$WEB_PLUGIN_PATH/inject.js"
     
-    cat > "$injection_script" << 'EOF'
-// Emby UI Plugin - Auto Injection Script
-// 自动注入脚本
-
+    cat > "$inject_script" << 'EOF'
+// Emby UI Plugin Injection Script
 (function() {
     'use strict';
     
     // 等待页面加载完成
-    function waitForEmby() {
-        if (typeof window !== 'undefined' && document.readyState === 'complete') {
-            injectPlugin();
+    function waitForElement(selector, callback) {
+        const element = document.querySelector(selector);
+        if (element) {
+            callback(element);
         } else {
-            setTimeout(waitForEmby, 100);
+            setTimeout(() => waitForElement(selector, callback), 100);
         }
     }
     
-    // 注入插件
-    function injectPlugin() {
-        try {
-            // 加载配置管理器
-            loadScript('/plugins/emby-ui-plugin/js/config-manager.js', function() {
-                // 加载主增强器
-                loadScript('/plugins/emby-ui-plugin/js/emby-enhancer.js', function() {
-                    console.log('[Emby UI Plugin] 插件加载完成');
-                });
-            });
-        } catch (error) {
-            console.error('[Emby UI Plugin] 插件加载失败:', error);
-        }
+    // 加载CSS主题
+    function loadTheme(themeName) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = `/plugins/emby-ui-plugin/themes/${themeName}.css`;
+        document.head.appendChild(link);
     }
     
-    // 动态加载脚本
-    function loadScript(src, callback) {
+    // 加载JavaScript模块
+    function loadScript(scriptPath) {
         const script = document.createElement('script');
-        script.src = src;
-        script.onload = callback;
-        script.onerror = function() {
-            console.error('[Emby UI Plugin] 脚本加载失败:', src);
-        };
+        script.src = `/plugins/emby-ui-plugin/js/${scriptPath}`;
         document.head.appendChild(script);
     }
     
-    // 开始等待
-    waitForEmby();
+    // 初始化插件
+    function initPlugin() {
+        // 加载默认主题
+        loadTheme('default');
+        
+        // 加载核心脚本
+        loadScript('main.js');
+        
+        console.log('Emby UI Plugin loaded successfully');
+    }
+    
+    // 页面加载完成后初始化
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initPlugin);
+    } else {
+        initPlugin();
+    }
 })();
 EOF
     
-    $SUDO chown abc:abc "$injection_script"
-    $SUDO chmod 644 "$injection_script"
-    
+    $SUDO chmod 644 "$inject_script"
     log_success "注入脚本创建完成"
+}
+
+# 更新Emby index.html
+update_emby_index() {
+    log_info "更新Emby index.html..."
+    
+    local index_file="$EMBY_WEB_PATH/index.html"
+    
+    if [ ! -f "$index_file" ]; then
+        log_warning "未找到Emby index.html文件: $index_file"
+        return
+    fi
+    
+    # 检查是否已经注入
+    if grep -q "emby-ui-plugin" "$index_file"; then
+        log_info "插件脚本已存在于index.html中"
+        return
+    fi
+    
+    # 备份原文件
+    $SUDO cp "$index_file" "$index_file.backup"
+    
+    # 在</head>标签前插入脚本
+    $SUDO sed -i 's|</head>|    <script src="/plugins/emby-ui-plugin/inject.js"></script>\n</head>|' "$index_file"
+    
+    log_success "Emby index.html更新完成"
 }
 
 # 创建默认配置
 create_default_config() {
     log_info "创建默认配置..."
     
-    local config_file="$PLUGIN_INSTALL_PATH/config/default.json"
+    local config_file="$PLUGIN_INSTALL_PATH/config.json"
     
-    cat > "$config_file" << 'EOF'
+    if [ ! -f "$config_file" ]; then
+        cat > "$config_file" << 'EOF'
 {
-  "version": "1.0.0",
-  "currentTheme": "dark-modern",
-  "enableCustomization": true,
-  "debugMode": false,
-  "autoApply": true,
-  "customColors": {},
-  "userPreferences": {
-    "animationSpeed": "normal",
-    "borderRadius": "medium",
-    "cardSpacing": "normal"
-  },
-  "advanced": {
-    "injectDelay": 100,
-    "observerThrottle": 50,
-    "cssVariablePrefix": "--emby-"
-  }
+    "version": "1.0.0",
+    "enabled": true,
+    "theme": "default",
+    "features": {
+        "customThemes": true,
+        "enhancedUI": true,
+        "customPages": true
+    },
+    "settings": {
+        "autoUpdate": false,
+        "debugMode": false
+    }
 }
 EOF
-    
-    $SUDO chown abc:abc "$config_file"
-    $SUDO chmod 644 "$config_file"
-    
-    log_success "默认配置创建完成"
+        $SUDO chmod 644 "$config_file"
+        log_success "默认配置创建完成"
+    else
+        log_info "配置文件已存在，跳过创建"
+    fi
 }
 
 # 创建API端点
 create_api_endpoints() {
     log_info "创建API端点..."
     
-    local api_dir="$WEB_PLUGIN_PATH/api"
-    $SUDO mkdir -p "$api_dir"
+    local api_file="$WEB_PLUGIN_PATH/api/config.php"
     
-    # 创建配置API
-    cat > "$api_dir/config.php" << 'EOF'
+    cat > "$api_file" << 'EOF'
 <?php
-// Emby UI Plugin - Configuration API
+// Emby UI Plugin API - Configuration Endpoint
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 header('Access-Control-Allow-Headers: Content-Type');
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit(0);
-}
+$configFile = '/config/plugins/emby-ui-plugin/config.json';
 
-$configFile = '/config/plugins/emby-ui-plugin/config/user.json';
-$defaultConfigFile = '/config/plugins/emby-ui-plugin/config/default.json';
-
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // 读取配置
-    if (file_exists($configFile)) {
-        echo file_get_contents($configFile);
-    } elseif (file_exists($defaultConfigFile)) {
-        echo file_get_contents($defaultConfigFile);
-    } else {
-        echo json_encode(['error' => 'Configuration not found']);
-    }
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // 保存配置
-    $input = file_get_contents('php://input');
-    $config = json_decode($input, true);
-    
-    if ($config) {
-        if (file_put_contents($configFile, json_encode($config, JSON_PRETTY_PRINT))) {
+switch ($_SERVER['REQUEST_METHOD']) {
+    case 'GET':
+        if (file_exists($configFile)) {
+            echo file_get_contents($configFile);
+        } else {
+            http_response_code(404);
+            echo json_encode(['error' => 'Configuration not found']);
+        }
+        break;
+        
+    case 'POST':
+    case 'PUT':
+        $input = json_decode(file_get_contents('php://input'), true);
+        if ($input) {
+            file_put_contents($configFile, json_encode($input, JSON_PRETTY_PRINT));
             echo json_encode(['success' => true]);
         } else {
-            echo json_encode(['error' => 'Failed to save configuration']);
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid JSON']);
         }
-    } else {
-        echo json_encode(['error' => 'Invalid JSON']);
-    }
+        break;
+        
+    default:
+        http_response_code(405);
+        echo json_encode(['error' => 'Method not allowed']);
 }
 ?>
 EOF
     
-    $SUDO chown abc:abc "$api_dir/config.php"
-    $SUDO chmod 644 "$api_dir/config.php"
-    
+    $SUDO chmod 644 "$api_file"
     log_success "API端点创建完成"
 }
 
 # 主安装函数
 main() {
-    log_info "开始安装 Emby UI 美化插件 v$PLUGIN_VERSION"
+    log_info "开始安装Emby UI插件..."
     
     check_requirements
     create_directories
     copy_plugin_files
-    set_permissions
     create_injection_script
+    update_emby_index
     create_default_config
     create_api_endpoints
     
-    log_success "插件安装完成！"
-    log_info "插件安装路径: $PLUGIN_INSTALL_PATH"
-    log_info "Web访问路径: $WEB_PLUGIN_PATH"
-    log_info "管理页面: http://your-emby-server:8096/plugins/emby-ui-plugin/pages/plugin-manager.html"
-    log_warning "请重启 Emby 服务器以使插件生效"
+    log_success "\n🎉 Emby UI插件安装完成！"
+    log_info "请重启Emby服务器以使更改生效"
+    log_info "插件配置文件位于: $PLUGIN_INSTALL_PATH/config.json"
+    log_info "Web文件位于: $WEB_PLUGIN_PATH"
 }
 
 # 错误处理
-trap 'log_error "安装过程中发生错误，退出码: $?"' ERR
+trap 'log_error "安装过程中发生错误，请检查日志"; exit 1' ERR
 
 # 执行主函数
 main "$@"
