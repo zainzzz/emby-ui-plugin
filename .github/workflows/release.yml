@@ -1,0 +1,122 @@
+name: Create Release Package
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name for the release'
+        required: true
+        default: 'v1.0.0'
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Create release package
+      run: |
+        # 创建临时目录
+        mkdir -p release-temp/emby-ui-plugin
+        
+        # 复制需要的文件，排除开发相关文件
+        rsync -av --exclude='.git' \
+                  --exclude='.github' \
+                  --exclude='.trae' \
+                  --exclude='node_modules' \
+                  --exclude='*.log' \
+                  --exclude='.env*' \
+                  --exclude='docker-compose*.yml' \
+                  --exclude='Dockerfile*' \
+                  --exclude='.gitignore' \
+                  --exclude='*.md' \
+                  ./ release-temp/emby-ui-plugin/
+        
+        # 创建tar.gz包
+        cd release-temp
+        tar -czf ../emby-ui-plugin.tar.gz emby-ui-plugin/
+        cd ..
+        
+        # 验证包内容
+        echo "Package contents:"
+        tar -tzf emby-ui-plugin.tar.gz | head -20
+        
+        # 显示包大小
+        ls -lh emby-ui-plugin.tar.gz
+    
+    - name: Get tag name
+      id: get_tag
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "tag_name=${{ github.event.inputs.tag_name }}" >> $GITHUB_OUTPUT
+        else
+          echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.get_tag.outputs.tag_name }}
+        release_name: Emby UI Plugin ${{ steps.get_tag.outputs.tag_name }}
+        body: |
+          ## Emby UI 美化插件 ${{ steps.get_tag.outputs.tag_name }}
+          
+          ### 📦 安装方法
+          
+          #### 方法一：直接下载
+          ```bash
+          wget https://github.com/zainzzz/emby-ui-plugin/releases/download/${{ steps.get_tag.outputs.tag_name }}/emby-ui-plugin.tar.gz
+          tar -xzf emby-ui-plugin.tar.gz
+          ```
+          
+          #### 方法二：Docker 集成
+          ```bash
+          # 下载并解压
+          wget https://github.com/zainzzz/emby-ui-plugin/releases/download/${{ steps.get_tag.outputs.tag_name }}/emby-ui-plugin.tar.gz
+          tar -xzf emby-ui-plugin.tar.gz
+          
+          # 复制到容器
+          docker cp emby-ui-plugin/ your-emby-container:/opt/emby-ui-plugin/
+          
+          # 执行安装
+          docker exec your-emby-container /opt/emby-ui-plugin/scripts/install-plugin.sh
+          
+          # 重启容器
+          docker restart your-emby-container
+          ```
+          
+          ### ✨ 主要特性
+          - 🎨 多主题支持（深色现代主题、浅色优雅主题）
+          - 🔧 高度可定制化配置
+          - 🐳 Docker 容器完美集成
+          - 📱 响应式设计，支持移动设备
+          - ⚡ 轻量级，不影响 Emby 性能
+          
+          ### 📋 系统要求
+          - Emby 版本：4.7.0+
+          - Docker：20.10+
+          - 现代浏览器支持
+          
+          ---
+          
+          **完整文档**: [README.md](https://github.com/zainzzz/emby-ui-plugin/blob/main/README.md)
+        draft: false
+        prerelease: false
+    
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./emby-ui-plugin.tar.gz
+        asset_name: emby-ui-plugin.tar.gz
+        asset_content_type: application/gzip
